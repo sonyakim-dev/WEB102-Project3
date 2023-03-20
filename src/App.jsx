@@ -8,9 +8,8 @@ function App() {
   const [catInfo, setCatInfo] = useState(null);
   const [banList, setBanList] = useState({
     origin: [],
-    energy: [],
-    adapt: [],
-    intell: [],
+    lifespan: [],
+    weight: [],
   });
 
   const fetchAPI = async () => {
@@ -26,24 +25,39 @@ function App() {
       name: breed.name,
       desc: breed.description,
       origin: breed.origin,
-      energy: breed.energy_level,
-      adapt: breed.adaptability,
-      intell: breed.intelligence,
+      lifespan: breed.life_span,
+      weight: breed.weight.imperial,
     };
 
     setCatInfo(cat);
     setHistory((prev) => [...prev, cat]);
+    // console.log(cat);
   };
 
-  const handleBan = (e) => {
-    if (prev[e.target.name].includes(e.target.value)) return
-    else setBanList((prev) => {
-      let copy = prev
-      console.log(copy);
-      copy[e.target.name].push(e.target.value)
-      return copy
-    });
-    console.log(banList);
+  const addToBanList = (e) => {
+    const key = e.target.name;
+    const val = e.target.value;
+
+    if (banList[key].includes(val)) return;
+    else {
+      setBanList((prev) => ({
+        ...prev,
+        [key]: [...prev[key], val],
+      }));
+    }
+    console.log("added to banlist", banList);
+  };
+
+  const removeFromBanList = (e) => {
+    const key = e.target.name;
+    const val = e.target.value; // value to remove
+    const index = banList[key].indexOf(val); // find the index of val
+    const list = banList[key];
+    list.splice(index, 1); // remove val from the array
+    setBanList((prev) => ({ // update list
+      ...prev,
+      [key]: list,
+    }));
   };
 
   return (
@@ -52,8 +66,8 @@ function App() {
         <br />
         <h3>History</h3>
         {history &&
-          history.map((cat) => (
-            <div className="">
+          history.map((cat, key) => (
+            <div className="" key={key}>
               <p>{cat.name}</p>
               <img src={cat.image} style={{ width: "100px" }} />
             </div>
@@ -66,17 +80,18 @@ function App() {
           <div className="catInfo">
             <h2>{catInfo.name}</h2>
             <p style={{ fontSize: "12px", margin: "0 50px" }}>{catInfo.desc}</p>
-            <button name="origin" value={catInfo.origin} onClick={handleBan}>
-              Origin: {catInfo.origin}
+            <button name="origin" value={catInfo.origin} onClick={addToBanList}>
+              {catInfo.origin}
             </button>
-            <button name="energy" value={catInfo.energy} onClick={handleBan}>
-              Energy: {catInfo.energy}
+            <button name="weight" value={catInfo.weight} onClick={addToBanList}>
+              {catInfo.weight} lbs
             </button>
-            <button name="adapt" value={catInfo.adapt} onClick={handleBan}>
-              Adaptability: {catInfo.adapt}
-            </button>
-            <button name="intell" value={catInfo.intell} onClick={handleBan}>
-              Intelligence: {catInfo.intell}
+            <button
+              name="lifespan"
+              value={catInfo.lifespan}
+              onClick={addToBanList}
+            >
+              {catInfo.lifespan} years
             </button>
             <img src={catInfo.image} />
           </div>
@@ -93,11 +108,28 @@ function App() {
         <h3>Ban List</h3>
         <p>Select an attribute</p>
         {banList &&
-          Object.entries(banList).map((key, val) => (
-            <button>
-              {key}: {val}
-            </button>
-          ))}
+          Object.entries(banList).map((key_list) => {
+            let key = key_list[0];
+            if (key === "weight") {
+              return key_list[1].map((val) => (
+                <button name={key} value={val} onClick={removeFromBanList}>
+                  {val} lbs
+                </button>
+              ));
+            } else if (key === "lifespan") {
+              return key_list[1].map((val) => (
+                <button name={key} value={val} onClick={removeFromBanList}>
+                  {val} years
+                </button>
+              ));
+            } else if (key === "origin") {
+              return key_list[1].map((val) => (
+                <button name={key} value={val} onClick={removeFromBanList}>
+                  {val}
+                </button>
+              ));
+            }
+          })}
       </div>
     </div>
   );
