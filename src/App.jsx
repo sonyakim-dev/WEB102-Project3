@@ -75,7 +75,7 @@ function App() {
       </div>
 
       <div className="main_panel">
-        <h1>CATS ARE CUTE</h1>
+        <h1>Everybody has a cat without only me</h1>
         {catInfo ? (
           <div className="catInfo">
             <h2>{catInfo.name}</h2>
